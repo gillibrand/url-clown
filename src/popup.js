@@ -11,6 +11,12 @@ function create(tagName, parentNode) {
   return el;
 }
 
+/**
+ * Builds the DOM nodes for a single row of a pairs section.
+ *
+ * @param {Node | undefined} parentNode Parent node to append the row to.
+ * @returns {[Node, Node, Node]} Tuple of newly created row, name input, and value input.
+ */
 function buildRow(parentNode) {
   const row = create('div', parentNode);
   row.classList.add('pairs__row');
@@ -22,7 +28,13 @@ function buildRow(parentNode) {
   return [row, nameInput, valueInput];
 }
 
-function renderSection(params, sectionEl, newLabel) {
+/**
+ *
+ * @param {HTMLSection} sectionEl Section to apps all the pair rows to.
+ * @param {Array<[string, string]>} params Name, value pairs.
+ * @param {String} newLabel Placeholder text to use for the "add new" row name input.
+ */
+function buildPairs(sectionEl, params, newLabel) {
   const frag = document.createDocumentFragment();
 
   params.forEach((value, name) => {
@@ -38,25 +50,38 @@ function renderSection(params, sectionEl, newLabel) {
   sectionEl.appendChild(frag);
 }
 
+/** Global for the active tab when we start. Sloppy convenience to use later. */
 let activeTab;
 
+/**
+ * Checks a pairs section to see if if has an empty "add new" row or not. Once the user types into
+ * this row, this function will fire and check if they have dirtied the "add new" row or not. If so,
+ * the styles are removed from that active row, and new, empty, "add new" row is added to the
+ * section.
+ *
+ * @param {HTMLSection} section The pairs section to check and add to.
+ */
 function addNewRowIfNeeded(section) {
   const rows = Array.from(section.querySelectorAll('.pairs__row'));
   const lastRow = rows[rows.length - 1];
   const [oldNameInput] = lastRow.querySelectorAll('input');
 
+  // If there is a name in this row, it's usable, so "dirty" and we can proceed and will need a new
+  // one.
   const hasNameText = oldNameInput.value.trim();
   if (!hasNameText) return;
 
+  // Turn into normal row.
   lastRow.classList.remove('is-new');
   const placeholder = oldNameInput.placeholder;
   oldNameInput.placeholder = '';
 
+  // Build the "new" row
   const [newRow, newNameInput] = buildRow();
   newRow.classList.add('is-new');
   newNameInput.placeholder = placeholder;
 
-  // Now animate height when it's added.
+  // Animate height when it's added.
   const startH = section.offsetHeight;
   section.appendChild(newRow);
   const endH = section.offsetHeight;
@@ -70,13 +95,29 @@ function addNewRowIfNeeded(section) {
   );
 }
 
+/**
+ * Regex to look for empty values in a param string. If they are empty we will delete them for a
+ * cleaner look that is functionally identical.
+ */
 const EmptyValueRe = /(=(?=&))|(=$)/g;
 
+/**
+ * Converts name-value pairs into a param string.
+ *
+ * @param {Array<[string, string]>} nameValuePairs Name, value pairs. Values can be empty strings
+ * @returns {string} String like "foo=bar&baz=splat"
+ */
 function asParamString(nameValuePairs) {
   const string = new URLSearchParams(nameValuePairs).toString();
   return string.replaceAll(EmptyValueRe, '');
 }
 
+/**
+ * Reads the name value pairs from a section element of the DOM. Call on hash and query sections
+ * separately.
+ * @param {HTMLElement} element Root element to read pairs from. A section normally.
+ * @returns {Array<[string, string]>} Name-value pairs.
+ */
 function getNameValuePairs(element) {
   const rows = Array.from(element.querySelectorAll('.pairs__row'));
 
@@ -93,19 +134,26 @@ function getNameValuePairs(element) {
   return nameValuePairs;
 }
 
+/**
+ * Uses the values in the form to update the URL of the active tab, then closes the popup.
+ */
 function updateActiveTabUrl() {
   const queryPairs = getNameValuePairs($('query'));
   const hashPairs = getNameValuePairs($('hash'));
 
   const url = new URL(activeTab.url);
 
+  // The Path
   url.pathname = encodeURI($('pathname').value.trim());
 
+  // The Query params
   const queryString = asParamString(queryPairs);
   if (queryString) {
     url.search = '?' + queryString;
   }
 
+  // The Hash params
+  //
   // If there is a single hash "name" without a = value, then assume it's a traditional single hash
   // value, as opposed to name value pairs. In that case, we don't escape the hash, just use as is.
   const isTraditionalHash = hashPairs.length === 1 && !hashPairs[0][1];
@@ -125,7 +173,7 @@ function updateActiveTabUrl() {
   window.close();
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function onStartup() {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const tab = tabs[0];
     activeTab = tab;
@@ -134,13 +182,13 @@ document.addEventListener('DOMContentLoaded', function () {
     $('pathname').value = decodeURI(url.pathname);
 
     const queryParams = new URLSearchParams(url.search);
-    renderSection(queryParams, $('query'), 'Add query param');
+    buildPairs($('query'), queryParams, 'Add query param');
 
     const hashParams = new URLSearchParams(url.hash.slice(1));
-    renderSection(hashParams, $('hash'), 'Add hash param');
+    buildPairs($('hash'), hashParams, 'Add hash param');
   });
 
-  $('form').addEventListener('input', (e) => {
+  $('form').addEventListener('input', function onInput(e) {
     $('ok').disabled = false;
 
     const section = e.target.closest('section');
@@ -150,13 +198,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  $('form').addEventListener('submit', (e) => {
+  $('form').addEventListener('submit', function onSubmit(e) {
     e.preventDefault();
     $('ok').disabled = true;
     updateActiveTabUrl();
   });
 
-  $('cancel').addEventListener('click', () => {
+  $('cancel').addEventListener('click', function onCance() {
     window.close();
   });
 });
