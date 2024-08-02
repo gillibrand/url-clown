@@ -1,6 +1,6 @@
 # URL Clown
 
-Easily decode and edit URL query and hash parameters.
+A Chrome extension to easily decode and edit URL query and hash parameters.
 
 # How to use
 
