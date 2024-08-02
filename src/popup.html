@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>URL Params Viewer</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
+  <body style="user-select: none">
+    <form id="form">
+      <h2 class="mt-0">Path</h2>
+      <input type="text" id="pathname" autofocus class="block w-full" />
+
+      <h2>Query (?)</h2>
+      <section id="query" class="pairs"></section>
+
+      <h2>Hash (#)</h2>
+      <section id="hash" class="pairs"></section>
+
+      <footer>
+        <div class="flex-auto cursor-default" title="Are you down to clown?">
+          🤡
+        </div>
+        <button type="button" id="cancel">Cancel</button>
+        <button type="submit" disabled id="ok" class="is-default">
+          Update
+        </button>
+      </footer>
+
+      <script src="popup.js"></script>
+    </form>
+  </body>
+</html>
