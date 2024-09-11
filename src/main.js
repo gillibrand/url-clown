@@ -1,3 +1,5 @@
+import { startDrag } from './dnd.js';
+
 function $(id) {
   return document.getElementById(id);
 }
@@ -22,7 +24,12 @@ function buildRow(parentNode) {
   row.classList.add('pairs__row');
 
   const nameInput = create('input', row);
-  create('span', row).textContent = '=';
+
+  var eq = create('span', row);
+  eq.textContent = '=';
+  eq.classList.add('pairs__eq');
+  eq.title = 'Resize columns';
+
   const valueInput = create('input', row);
 
   return [row, nameInput, valueInput];
@@ -44,7 +51,6 @@ function buildPairs(sectionEl, params, newLabel) {
   });
 
   const [newRow, nameInput] = buildRow(frag);
-  newRow.classList.add('is-new');
   nameInput.placeholder = newLabel;
 
   sectionEl.appendChild(frag);
@@ -72,13 +78,11 @@ function addNewRowIfNeeded(section) {
   if (!hasNameText) return;
 
   // Turn into normal row.
-  lastRow.classList.remove('is-new');
   const placeholder = oldNameInput.placeholder;
   oldNameInput.placeholder = '';
 
   // Build the "new" row
   const [newRow, newNameInput] = buildRow();
-  newRow.classList.add('is-new');
   newNameInput.placeholder = placeholder;
 
   // Animate height when it's added.
@@ -173,6 +177,52 @@ function updateActiveTabUrl() {
   window.close();
 }
 
+function getFirstColWidthPx() {
+  return parseInt(
+    window.getComputedStyle(document.body).getPropertyValue('--first-col-width')
+  );
+}
+
+function setFirstColWidthPx(widthPx) {
+  document.body.style.setProperty('--first-col-width', widthPx + 'px');
+}
+
+const savedWidthPx = localStorage.getItem('widthPx');
+if (savedWidthPx > 0) {
+  console.debug('>>> restored col width', savedWidthPx);
+  setFirstColWidthPx(savedWidthPx);
+}
+
+/**
+ * Checks if the element mousedowned on is an equals sign divider. If so, starts a DnD operation
+ * that resizes the columns.
+ *
+ * @param {MouseEvent} e mousedown even that start a drag.
+ */
+function tryStartDrag(e) {
+  if (!e.target.classList.contains('pairs__eq')) return;
+  const startWidthPx = getFirstColWidthPx();
+  document.body.classList.add('is-dragging');
+  e.target.classList.add('is-dragging');
+
+  startDrag(
+    e,
+
+    function onMove(diffX, _) {
+      const widthPx = Math.max(100, Math.min(600, startWidthPx + diffX));
+      setFirstColWidthPx(widthPx);
+    },
+
+    function onEnd() {
+      e.target.classList.remove('is-dragging');
+      document.body.classList.remove('is-dragging');
+
+      const widthPx = getFirstColWidthPx();
+      localStorage.setItem('widthPx', widthPx);
+    }
+  );
+}
+
 document.addEventListener('DOMContentLoaded', function onStartup() {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const tab = tabs[0];
@@ -207,4 +257,6 @@ document.addEventListener('DOMContentLoaded', function onStartup() {
   $('cancel').addEventListener('click', function onCance() {
     window.close();
   });
+
+  document.body.addEventListener('mousedown', tryStartDrag);
 });

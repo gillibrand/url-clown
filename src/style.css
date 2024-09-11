@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+:root {
+  --first-col-width: 200px;
+}
+
 body {
   background-color: #f7f7f7;
   width: 750px;
@@ -22,7 +26,7 @@ input[type='text'] {
   border-radius: 3px;
   padding: 0.3rem;
   border: solid 1px rgb(67, 67, 67);
-  min-width: 10rem;
+  min-width: 5rem;
   font-size: inherit;
 }
 
@@ -35,7 +39,8 @@ h2 {
 
 .pairs {
   display: grid;
-  grid-template-columns: auto auto 1fr;
+  position: relative;
+  grid-template-columns: var(--first-col-width) auto 1fr;
   gap: 0.5rem;
   overflow: hidden;
 }
@@ -44,11 +49,18 @@ h2 {
   display: contents;
 }
 
-.is-new {
-  input {
-    /* border: dashed 1px gray; */
-    border-style: dashed;
-  }
+body.is-dragging,
+body.is-dragging * {
+  cursor: ew-resize !important;
+}
+
+.pairs__eq {
+  cursor: ew-resize;
+  grid-column: 2 / 3;
+}
+
+.pairs__eq.is-dragging {
+  background-color: #ddd;
 }
 
 footer {
@@ -118,4 +130,25 @@ button {
 
 .cursor-default {
   cursor: default;
+}
+
+.clown {
+  font-size: 1.125rem;
+  transition: transform 500ms ease-in;
+  transform: rotate(0);
+  display: inline-block;
+}
+
+/* @keyframes anim-rotate {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+} */
+
+.clown:hover {
+  /* animation: anim-rotate 1s linear infinite; */
+  transform: rotate(360deg);
 }
