@@ -31,6 +31,7 @@ function buildRow(parentNode) {
   eq.title = 'Resize columns';
 
   const valueInput = create('input', row);
+  valueInput.setAttribute('list', 'test');
 
   return [row, nameInput, valueInput];
 }
@@ -50,7 +51,7 @@ function buildPairs(sectionEl, params, newLabel) {
     valueInput.value = value || '';
   });
 
-  const [newRow, nameInput] = buildRow(frag);
+  const [, nameInput] = buildRow(frag);
   nameInput.placeholder = newLabel;
 
   sectionEl.appendChild(frag);
@@ -89,7 +90,7 @@ function addNewRowIfNeeded(section) {
   const startH = section.offsetHeight;
   section.appendChild(newRow);
   const endH = section.offsetHeight;
-  section.animate(
+  const anim = section.animate(
     {
       height: [`${startH}px`, `${endH}px`],
     },
@@ -97,6 +98,9 @@ function addNewRowIfNeeded(section) {
       duration: 200,
     }
   );
+
+  // Splitter neeeds new height.
+  anim.finished.then(positionSplitter);
 }
 
 /**
@@ -200,17 +204,22 @@ if (savedWidthPx > 0) {
  * @param {MouseEvent} e mousedown even that start a drag.
  */
 function tryStartDrag(e) {
-  if (!e.target.classList.contains('pairs__eq')) return;
+  if (!e.target.classList.contains('splitter')) return;
+
   const startWidthPx = getFirstColWidthPx();
   document.body.classList.add('is-dragging');
   e.target.classList.add('is-dragging');
 
+  const splitter = $('splitter');
+
   startDrag(
     e,
 
-    function onMove(diffX, _) {
-      const widthPx = Math.max(100, Math.min(600, startWidthPx + diffX));
+    function onMove(diffX) {
+      // const widthPx = Math.max(100, Math.min(600, startWidthPx + diffX));
+      const widthPx = startWidthPx + diffX;
       setFirstColWidthPx(widthPx);
+      splitter.style.translate = `${diffX}px`;
     },
 
     function onEnd() {
@@ -219,8 +228,31 @@ function tryStartDrag(e) {
 
       const widthPx = getFirstColWidthPx();
       localStorage.setItem('widthPx', widthPx);
-    }
+      positionSplitter();
+    },
+
+    150,
+    window.innerWidth - 150
   );
+}
+
+function positionSplitter() {
+  const splitter = $('splitter');
+  const eqs = document.querySelectorAll('.pairs__eq');
+
+  const eq1 = eqs[0];
+  const rect1 = eq1.getBoundingClientRect();
+
+  const eq2 = eqs[eqs.length - 1];
+  const rect2 = eq2.getBoundingClientRect();
+
+  Object.assign(splitter.style, {
+    translate: 'none',
+    top: rect1.top + 'px',
+    left: rect1.left + 'px',
+    height: rect2.bottom - rect1.top + 'px',
+    width: rect1.width + 'px',
+  });
 }
 
 document.addEventListener('DOMContentLoaded', function onStartup() {
@@ -236,6 +268,9 @@ document.addEventListener('DOMContentLoaded', function onStartup() {
 
     const hashParams = new URLSearchParams(url.hash.slice(1));
     buildPairs($('hash'), hashParams, 'Add hash param');
+
+    positionSplitter();
+    $('splitter').addEventListener('mousedown', tryStartDrag);
   });
 
   $('form').addEventListener('input', function onInput(e) {
@@ -257,6 +292,4 @@ document.addEventListener('DOMContentLoaded', function onStartup() {
   $('cancel').addEventListener('click', function onCance() {
     window.close();
   });
-
-  document.body.addEventListener('mousedown', tryStartDrag);
 });

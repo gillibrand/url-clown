@@ -63,6 +63,22 @@ body.is-dragging * {
   background-color: #ddd;
 }
 
+.splitter {
+  position: absolute;
+  opacity: 0;
+  cursor: ew-resize;
+  /* transition: opacity 100ms ease; */
+  background-color: gray;
+
+  &:hover {
+    opacity: 0.15;
+  }
+
+  body.is-dragging & {
+    opacity: 0.3;
+  }
+}
+
 footer {
   display: flex;
   gap: 1rem;
