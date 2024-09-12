@@ -4,7 +4,13 @@ function $(id) {
   return document.getElementById(id);
 }
 
-/** Convenience to create an element. */
+/**
+ * Convenience to create an element.
+ *
+ * @param {string} Tag name.
+ * @param {undefined | HTMLElement} Parent element to add new element to.
+ * @returns {HTMLElement} New element.
+ */
 function create(tagName, parentNode) {
   const el = document.createElement(tagName);
   if (parentNode) {
@@ -24,6 +30,7 @@ function buildRow(parentNode) {
   row.classList.add('pairs__row');
 
   const nameInput = create('input', row);
+  nameInput.spellcheck = false;
 
   var eq = create('span', row);
   eq.textContent = '=';
@@ -31,7 +38,7 @@ function buildRow(parentNode) {
   eq.title = 'Resize columns';
 
   const valueInput = create('input', row);
-  valueInput.setAttribute('list', 'test');
+  valueInput.spellcheck = false;
 
   return [row, nameInput, valueInput];
 }
