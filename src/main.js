@@ -163,9 +163,7 @@ function updateActiveTabUrl() {
 
   // The Query params
   const queryString = asParamString(queryPairs);
-  if (queryString) {
-    url.search = '?' + queryString;
-  }
+  url.search = queryString ? '?' + queryString : '';
 
   // The Hash params
   //
@@ -176,9 +174,7 @@ function updateActiveTabUrl() {
     ? hashPairs[0][0]
     : asParamString(hashPairs);
 
-  if (hashString) {
-    url.hash = '#' + hashString;
-  }
+  url.hash = hashString ? '#' + hashString : '';
 
   const urlString = url.toString();
   if (urlString !== activeTab.url) {
