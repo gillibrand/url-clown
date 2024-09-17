@@ -14,7 +14,6 @@ body {
   padding: 0.5rem;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  font-size: 10pt;
 }
 
 input {
@@ -25,7 +24,7 @@ input:not([type]),
 input[type='text'] {
   border-radius: 3px;
   padding: 0.3rem;
-  border: solid 1px rgb(67, 67, 67);
+  border: solid 1px rgb(101, 101, 101);
   min-width: 5rem;
   font-size: inherit;
 }
@@ -67,7 +66,7 @@ body.is-dragging * {
   position: absolute;
   opacity: 0;
   cursor: ew-resize;
-  /* transition: opacity 100ms ease; */
+  transition: opacity 100ms ease 25ms;
   background-color: gray;
 
   &:hover {
@@ -86,6 +85,9 @@ footer {
   margin-block-start: 2rem;
 }
 
+form {
+}
+
 button {
   min-width: 5rem;
   appearance: none;
@@ -93,8 +95,10 @@ button {
 
   padding: 0.25rem 0.75rem;
   border-radius: 0.3rem;
-  background-color: #f7f7f7;
   background-color: #fff;
+
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
 
   &:not(:disabled) {
     border-bottom-color: #333;
@@ -110,10 +114,18 @@ button {
 
   &:not([disabled]).is-default {
     color: white;
-    background-color: dodgerblue;
+    background-color: #027aff;
+    background-color: #268dff;
+    border-color: #215a99;
+    border-bottom-color: #113762;
+    /* background-image: linear-gradient(to bottom, #268dff, #027aff); */
+
+    text-shadow: 0 0px 2px #113762;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15),
+      inset 0 1px 1px rgba(255, 255, 255, 0.2);
 
     &:hover {
-      background-color: rgb(24, 131, 237);
+      background-color: rgb(35, 133, 232);
     }
 
     &:active {
@@ -154,15 +166,6 @@ button {
   transform: rotate(0);
   display: inline-block;
 }
-
-/* @keyframes anim-rotate {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-} */
 
 .clown:hover {
   /* animation: anim-rotate 1s linear infinite; */
