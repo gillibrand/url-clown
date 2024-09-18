@@ -4,7 +4,7 @@ A Chrome extension to easily decode and edit URL query and hash parameters.
 
 ## How to use
 
-Open and make a change. Click `Update` to update the URL on the current tab.
+Open and make a change. Click `Save` to update the URL on the current tab.
 
 `Path` edits the path. It is shown decoded.
 
