@@ -4,7 +4,7 @@
   box-sizing: border-box;
 }
 
-:root {
+html {
   --first-col-width: 200px;
 }
 
@@ -83,9 +83,7 @@ footer {
   gap: 1rem;
   justify-content: flex-end;
   margin-block-start: 2rem;
-}
-
-form {
+  align-items: center;
 }
 
 button {
@@ -114,13 +112,9 @@ button {
 
   &:not([disabled]).is-default {
     color: white;
-    background-color: #027aff;
-    background-color: #268dff;
-    border-color: #215a99;
+    background-color: #2b68d1;
     border-bottom-color: #113762;
-    /* background-image: linear-gradient(to bottom, #268dff, #027aff); */
 
-    text-shadow: 0 0px 2px #113762;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15),
       inset 0 1px 1px rgba(255, 255, 255, 0.2);
 
@@ -161,10 +155,12 @@ button {
 }
 
 .clown {
-  font-size: 1.125rem;
   transition: transform 500ms ease-in;
   transform: rotate(0);
+  transform-origin: center 65%;
   display: inline-block;
+  max-width: 32px;
+  object-fit: fill;
 }
 
 .clown:hover {
