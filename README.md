@@ -1,4 +1,4 @@
-# <img src="./icons/icon48.png" srcset="./icons/icon48.png 1x, ./icons/icon128.png 2x" alt="Alt text"> URL Clown
+# <img src="./icons/clown32.svg" alt="clown head"> URL Clown
 
 A Chrome extension to easily decode and edit URL query and hash parameters.
 
