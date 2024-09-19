@@ -36,7 +36,12 @@ h2 {
   margin: 1.25rem 0 0.5rem;
 }
 
-.pairs {
+body.is-dragging,
+body.is-dragging * {
+  cursor: ew-resize !important;
+}
+
+.ParamTable {
   display: grid;
   position: relative;
   grid-template-columns: var(--first-col-width) auto 1fr auto;
@@ -45,21 +50,16 @@ h2 {
   align-items: center;
 }
 
-.pairs__row {
+.ParamTable__row {
   display: contents;
 }
 
-body.is-dragging,
-body.is-dragging * {
-  cursor: ew-resize !important;
-}
-
-.pairs__eq {
+.ParamTable__eq {
   cursor: ew-resize;
   grid-column: 2 / 3;
 }
 
-.pairs__eq.is-dragging {
+.ParamTable__eq.is-dragging {
   background-color: #ddd;
 }
 

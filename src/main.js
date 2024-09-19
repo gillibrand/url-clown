@@ -1,155 +1,9 @@
 import { startDrag } from './dnd.js';
-
-function $(id) {
-  return document.getElementById(id);
-}
-
-/**
- * Convenience to create an element.
- *
- * @param {string} Tag name.
- * @param {undefined | HTMLElement} Parent element to add new element to.
- * @returns {HTMLElement} New element.
- */
-function create(tagName, parentNode) {
-  const el = document.createElement(tagName);
-  if (parentNode) {
-    parentNode.appendChild(el);
-  }
-  return el;
-}
-
-function createNS(namespace, tagName, parentNode) {
-  const el = document.createElementNS(namespace, tagName);
-  if (parentNode) {
-    parentNode.appendChild(el);
-  }
-  return el;
-}
-
-/**
- * Builds the DOM nodes for a single row of a pairs section.
- *
- * @param {Node | undefined} parentNode Parent node to append the row to.
- * @returns {[Node, Node, Node]} Tuple of newly created row, name input, and value input.
- */
-function buildRow(parentNode) {
-  const row = create('div', parentNode);
-  row.classList.add('pairs__row');
-
-  const nameInput = create('input', row);
-  nameInput.spellcheck = false;
-
-  var eq = create('span', row);
-  eq.textContent = '=';
-  eq.className = 'pairs__eq';
-  eq.title = 'Resize columns';
-
-  const valueInput = create('input', row);
-  valueInput.spellcheck = false;
-
-  const deleteButton = create('button', row);
-  deleteButton.className = 'delete-button';
-  deleteButton.title = 'Delete';
-  deleteButton.type = 'button';
-
-  const svg = createNS('http://www.w3.org/2000/svg', 'svg', deleteButton);
-  const use = createNS('http://www.w3.org/2000/svg', 'use', svg);
-  use.setAttributeNS(
-    'http://www.w3.org/1999/xlink',
-    'xlink:href',
-    '../icons/symbol/sheet.svg#close'
-  );
-
-  return [row, nameInput, valueInput, toolbar, deleteButton];
-}
-
-/**
- *
- * @param {HTMLSection} sectionEl Section to apps all the pair rows to.
- * @param {Array<[string, string]>} params Name, value pairs.
- * @param {String} newLabel Placeholder text to use for the "add new" row name input.
- */
-function buildPairs(sectionEl, params, newLabel) {
-  const frag = document.createDocumentFragment();
-
-  params.forEach((value, name) => {
-    const [, nameInput, valueInput] = buildRow(frag);
-    nameInput.value = name;
-    valueInput.value = value || '';
-  });
-
-  const [, nameInput] = buildRow(frag);
-  nameInput.placeholder = newLabel;
-
-  sectionEl.appendChild(frag);
-}
+import { ParamTable } from './ParamTable.js';
+import { $ } from './utils.js';
 
 /** Global for the active tab when we start. Sloppy convenience to use later. */
 let activeTab;
-
-class Pairs {
-  constructor(sectionEl, placeholderText) {
-    this.el = sectionEl;
-
-    const frag = document.createDocumentFragment();
-
-    params.forEach((value, name) => {
-      const [, nameInput, valueInput] = buildRow(frag);
-      nameInput.value = name;
-      valueInput.value = value || '';
-    });
-
-    const [, nameInput] = buildRow(frag);
-    nameInput.placeholder = newLabel;
-
-    this.el.appendChild(frag);
-  }
-}
-
-/**
- * Checks a pairs section to see if if has an empty "add new" row or not. Once the user types into
- * this row, this function will fire and check if they have dirtied the "add new" row or not. If so,
- * the styles are removed from that active row, and new, empty, "add new" row is added to the
- * section.
- *
- * @param {HTMLSection} section The pairs section to check and add to.
- */
-function addNewRowIfNeeded(section) {
-  const rows = Array.from(section.querySelectorAll('.pairs__row'));
-  const lastRow = rows[rows.length - 1];
-  const [oldNameInput] = lastRow.querySelectorAll('input');
-
-  // If there is a name in this row, it's usable, so "dirty" and we can proceed and will need a new
-  // one.
-  const hasNameText = oldNameInput.value.trim();
-  if (!hasNameText) return;
-
-  // Turn into normal row.
-  const placeholder = oldNameInput.placeholder;
-  oldNameInput.placeholder = '';
-
-  // Build the "new" row
-  const [newRow, newNameInput] = buildRow();
-  newNameInput.placeholder = placeholder;
-
-  // Animate height when it's added.
-  const startH = section.offsetHeight;
-  section.appendChild(newRow);
-  const endH = section.offsetHeight;
-  const anim = section.animate(
-    {
-      height: [`${startH}px`, `${endH}px`],
-    },
-    {
-      duration: 200,
-    }
-  );
-
-  toggleDeleteButtons();
-  // Splitter neeeds new height.
-  anim.finished.then(positionSplitter);
-}
 
 /**
  * Regex to look for empty values in a param string. If they are empty we will delete them for a
@@ -169,33 +23,11 @@ function asParamString(nameValuePairs) {
 }
 
 /**
- * Reads the name value pairs from a section element of the DOM. Call on hash and query sections
- * separately.
- * @param {HTMLElement} element Root element to read pairs from. A section normally.
- * @returns {Array<[string, string]>} Name-value pairs.
- */
-function getNameValuePairs(element) {
-  const rows = Array.from(element.querySelectorAll('.pairs__row'));
-
-  const nameValuePairs = [];
-  for (let row of rows) {
-    const [nameInput, valueInput] = row.querySelectorAll('input');
-
-    // Skip empty names
-    if (!nameInput.value.trim()) continue;
-
-    nameValuePairs.push([nameInput.value.trim(), valueInput.value.trim()]);
-  }
-
-  return nameValuePairs;
-}
-
-/**
  * Uses the values in the form to update the URL of the active tab, then closes the popup.
  */
 function updateActiveTabUrl() {
-  const queryPairs = getNameValuePairs($('query'));
-  const hashPairs = getNameValuePairs($('hash'));
+  const queryPairs = queryTable.getNameValuePairs($('query'));
+  const hashPairs = hashTable.getNameValuePairs($('hash'));
 
   const url = new URL(activeTab.url);
 
@@ -280,9 +112,12 @@ function tryStartDrag(e) {
   );
 }
 
+/**
+ * Updates the height an position of the splitter to cover the "=" column of both param tables.
+ */
 function positionSplitter() {
   const splitter = $('splitter');
-  const eqs = document.querySelectorAll('.pairs__eq');
+  const eqs = document.querySelectorAll('.ParamTable__eq');
 
   const eq1 = eqs[0];
   const rect1 = eq1.getBoundingClientRect();
@@ -299,48 +134,8 @@ function positionSplitter() {
   });
 }
 
-/**
- *
- * @param {HTMLElement} row
- */
-function deleteRow(row) {
-  const section = row.closest('.pairs');
-  if (!section) return;
-
-  const rows = section.querySelectorAll('.pairs__row');
-  if (rows.length === 1) {
-    row.querySelectorAll('input').forEach((input) => {
-      input.value = '';
-    });
-  } else {
-    row.parentNode.removeChild(row);
-  }
-
-  toggleDeleteButtons();
-}
-
-function toggleDeleteButtons() {
-  const sections = $('form').querySelectorAll('section');
-
-  for (let i = 0; i < sections.length; i++) {
-    const section = sections[i];
-    const rowsInSection = section.querySelectorAll('.pairs__row');
-
-    if (rowsInSection.length > 1) {
-      section
-        .querySelectorAll('.delete-button')
-        .forEach((b) => (b.disabled = false));
-    } else {
-      const oneRow = rowsInSection[0];
-      const hasAnyText = Array.from(oneRow.querySelectorAll('input')).some(
-        (input) => input.value.trim()
-      );
-
-      const button = oneRow.querySelector('.delete-button');
-      button.disabled = !hasAnyText;
-    }
-  }
-}
+let queryTable;
+let hashTable;
 
 document.addEventListener('DOMContentLoaded', function onStartup() {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -350,33 +145,34 @@ document.addEventListener('DOMContentLoaded', function onStartup() {
 
     $('pathname').value = decodeURI(url.pathname);
 
+    function onValueChange() {
+      $('ok').disabled = false;
+    }
+
+    function onRowChange() {
+      positionSplitter();
+    }
+
     const queryParams = new URLSearchParams(url.search);
-    buildPairs($('query'), queryParams, 'Add query param');
+    queryTable = new ParamTable(
+      $('query'),
+      queryParams,
+      'Add query param',
+      onValueChange,
+      onRowChange
+    );
 
     const hashParams = new URLSearchParams(url.hash.slice(1));
-    buildPairs($('hash'), hashParams, 'Add hash param');
-    toggleDeleteButtons();
+    hashTable = new ParamTable(
+      $('hash'),
+      hashParams,
+      'Add hash param',
+      onValueChange,
+      onRowChange
+    );
 
     positionSplitter();
     $('splitter').addEventListener('mousedown', tryStartDrag);
-  });
-
-  $('form').addEventListener('input', function onInput(e) {
-    $('ok').disabled = false;
-
-    const section = e.target.closest('section');
-
-    if (section) {
-      addNewRowIfNeeded(section);
-    }
-  });
-
-  $('form').addEventListener('click', function onInput(e) {
-    const button = e.target.closest('button');
-    if (button && button.classList.contains('delete-button')) {
-      e.stopPropagation();
-      deleteRow(button.closest('.pairs__row'));
-    }
   });
 
   $('form').addEventListener('submit', function onSubmit(e) {

@@ -7,19 +7,17 @@ export default [
     languageOptions: {
       globals: { ...globals.browser, ...globals.webextensions },
     },
-    rules: [
-      {
-        'no-unused-vars': [
-          'error',
-          {
-            vars: 'all',
-            args: 'after-used',
-            caughtErrors: 'none',
-            ignoreRestSiblings: false,
-            reportUsedIgnorePattern: false,
-          },
-        ],
-      },
-    ],
+    rules: {
+      'no-unused-vars': [
+        'error',
+        {
+          vars: 'all',
+          args: 'after-used',
+          caughtErrors: 'none',
+          ignoreRestSiblings: false,
+          reportUsedIgnorePattern: false,
+        },
+      ],
+    },
   },
 ];

@@ -52,9 +52,8 @@ function startDrag(e, onDrag, onEnd, minX, maxX) {
 
   /**
    * Called on mouseup, which  normally ends a drag.
-   * @param {MouseEvent} e mouseup event.
    */
-  function onMouseUp(e) {
+  function onMouseUp() {
     cleanUp();
   }
 }
