@@ -39,9 +39,10 @@ h2 {
 .pairs {
   display: grid;
   position: relative;
-  grid-template-columns: var(--first-col-width) auto 1fr;
+  grid-template-columns: var(--first-col-width) auto 1fr auto;
   gap: 0.5rem;
   overflow: hidden;
+  align-items: center;
 }
 
 .pairs__row {
@@ -84,10 +85,12 @@ footer {
   justify-content: flex-end;
   margin-block-start: 2rem;
   align-items: center;
+  button {
+    min-width: 5rem;
+  }
 }
 
 button {
-  min-width: 5rem;
   appearance: none;
   border: solid 1px #999;
 
@@ -128,6 +131,36 @@ button {
   }
 }
 
+.delete-button {
+  appearance: none;
+  padding: 0;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  height: 24px;
+  width: 24px;
+  border: none;
+  background-color: transparent;
+  border-radius: 3px;
+  color: #666;
+
+  &:disabled {
+    visibility: hidden;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: rgb(222, 66, 66);
+    svg {
+      color: white;
+    }
+  }
+
+  & > svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
 /* Utils */
 
 .block {
@@ -157,7 +190,7 @@ button {
 .clown {
   transition: transform 500ms ease-in;
   transform: rotate(0);
-  transform-origin: center 65%;
+  transform-origin: center 20px;
   display: inline-block;
   max-width: 32px;
   object-fit: fill;

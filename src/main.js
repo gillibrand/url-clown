@@ -19,6 +19,14 @@ function create(tagName, parentNode) {
   return el;
 }
 
+function createNS(namespace, tagName, parentNode) {
+  const el = document.createElementNS(namespace, tagName);
+  if (parentNode) {
+    parentNode.appendChild(el);
+  }
+  return el;
+}
+
 /**
  * Builds the DOM nodes for a single row of a pairs section.
  *
@@ -34,13 +42,26 @@ function buildRow(parentNode) {
 
   var eq = create('span', row);
   eq.textContent = '=';
-  eq.classList.add('pairs__eq');
+  eq.className = 'pairs__eq';
   eq.title = 'Resize columns';
 
   const valueInput = create('input', row);
   valueInput.spellcheck = false;
 
-  return [row, nameInput, valueInput];
+  const deleteButton = create('button', row);
+  deleteButton.className = 'delete-button';
+  deleteButton.title = 'Delete';
+  deleteButton.type = 'button';
+
+  const svg = createNS('http://www.w3.org/2000/svg', 'svg', deleteButton);
+  const use = createNS('http://www.w3.org/2000/svg', 'use', svg);
+  use.setAttributeNS(
+    'http://www.w3.org/1999/xlink',
+    'xlink:href',
+    '../icons/symbol/sheet.svg#close'
+  );
+
+  return [row, nameInput, valueInput, toolbar, deleteButton];
 }
 
 /**
@@ -66,6 +87,25 @@ function buildPairs(sectionEl, params, newLabel) {
 
 /** Global for the active tab when we start. Sloppy convenience to use later. */
 let activeTab;
+
+class Pairs {
+  constructor(sectionEl, placeholderText) {
+    this.el = sectionEl;
+
+    const frag = document.createDocumentFragment();
+
+    params.forEach((value, name) => {
+      const [, nameInput, valueInput] = buildRow(frag);
+      nameInput.value = name;
+      valueInput.value = value || '';
+    });
+
+    const [, nameInput] = buildRow(frag);
+    nameInput.placeholder = newLabel;
+
+    this.el.appendChild(frag);
+  }
+}
 
 /**
  * Checks a pairs section to see if if has an empty "add new" row or not. Once the user types into
@@ -106,6 +146,7 @@ function addNewRowIfNeeded(section) {
     }
   );
 
+  toggleDeleteButtons();
   // Splitter neeeds new height.
   anim.finished.then(positionSplitter);
 }
@@ -258,6 +299,49 @@ function positionSplitter() {
   });
 }
 
+/**
+ *
+ * @param {HTMLElement} row
+ */
+function deleteRow(row) {
+  const section = row.closest('.pairs');
+  if (!section) return;
+
+  const rows = section.querySelectorAll('.pairs__row');
+  if (rows.length === 1) {
+    row.querySelectorAll('input').forEach((input) => {
+      input.value = '';
+    });
+  } else {
+    row.parentNode.removeChild(row);
+  }
+
+  toggleDeleteButtons();
+}
+
+function toggleDeleteButtons() {
+  const sections = $('form').querySelectorAll('section');
+
+  for (let i = 0; i < sections.length; i++) {
+    const section = sections[i];
+    const rowsInSection = section.querySelectorAll('.pairs__row');
+
+    if (rowsInSection.length > 1) {
+      section
+        .querySelectorAll('.delete-button')
+        .forEach((b) => (b.disabled = false));
+    } else {
+      const oneRow = rowsInSection[0];
+      const hasAnyText = Array.from(oneRow.querySelectorAll('input')).some(
+        (input) => input.value.trim()
+      );
+
+      const button = oneRow.querySelector('.delete-button');
+      button.disabled = !hasAnyText;
+    }
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function onStartup() {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const tab = tabs[0];
@@ -271,6 +355,7 @@ document.addEventListener('DOMContentLoaded', function onStartup() {
 
     const hashParams = new URLSearchParams(url.hash.slice(1));
     buildPairs($('hash'), hashParams, 'Add hash param');
+    toggleDeleteButtons();
 
     positionSplitter();
     $('splitter').addEventListener('mousedown', tryStartDrag);
@@ -283,6 +368,14 @@ document.addEventListener('DOMContentLoaded', function onStartup() {
 
     if (section) {
       addNewRowIfNeeded(section);
+    }
+  });
+
+  $('form').addEventListener('click', function onInput(e) {
+    const button = e.target.closest('button');
+    if (button && button.classList.contains('delete-button')) {
+      e.stopPropagation();
+      deleteRow(button.closest('.pairs__row'));
     }
   });
 

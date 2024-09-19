@@ -2,6 +2,10 @@
   "devDependencies": {
     "@eslint/js": "^9.10.0",
     "eslint": "^9.10.0",
-    "globals": "^15.9.0"
+    "globals": "^15.9.0",
+    "svg-sprite": "^2.0.4"
+  },
+  "scripts": {
+    "sheet": "svg-sprite --symbol --dest icons --ss=sheet.svg icons/close.svg"
   }
 }
