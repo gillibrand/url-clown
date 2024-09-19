@@ -150,6 +150,7 @@ document.addEventListener('DOMContentLoaded', function onStartup() {
     }
 
     function onRowChange() {
+      $('ok').disabled = false;
       positionSplitter();
     }
 

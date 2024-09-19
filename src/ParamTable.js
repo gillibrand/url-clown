@@ -12,6 +12,7 @@ function createRow(optionalParentNode) {
 
   const nameInput = create('input', row);
   nameInput.spellcheck = false;
+  nameInput.dataset['name'] = '';
 
   var eq = create('span', row);
   eq.textContent = '=';
@@ -55,6 +56,7 @@ class ParamTable {
   ) {
     this.el = sectionEl;
     this.onRowChange = onRowChange;
+    this.placeholder = placeholderText;
 
     const frag = document.createDocumentFragment();
 
@@ -99,6 +101,7 @@ class ParamTable {
       this.onRowChange();
     }
 
+    this._renderPlaceholders();
     this._renderDeleteButtons();
   }
 
@@ -107,14 +110,16 @@ class ParamTable {
    * hidden. Otherwise they are all shown in this table.
    */
   _renderDeleteButtons() {
-    const rowsInSection = this.el.querySelectorAll('.ParamTable__row');
+    const rows = this.el.querySelectorAll('.ParamTable__row');
 
-    if (rowsInSection.length > 1) {
-      this.el
-        .querySelectorAll('.delete-button')
-        .forEach((b) => (b.disabled = false));
+    if (rows.length > 1) {
+      const buttons = Array.from(this.el.querySelectorAll('.delete-button'));
+      const mostButtons = buttons.slice(0, -1);
+      mostButtons.forEach((b) => (b.disabled = false));
+      // Last placeholder row cannot be deleted
+      buttons.at(-1).disabled = true;
     } else {
-      const oneRow = rowsInSection[0];
+      const oneRow = rows[0];
       const hasAnyText = Array.from(oneRow.querySelectorAll('input')).some(
         (input) => input.value.trim()
       );
@@ -143,12 +148,11 @@ class ParamTable {
     if (!hasNameText) return;
 
     // Turn into normal row.
-    const placeholder = oldNameInput.placeholder;
     oldNameInput.placeholder = '';
 
     // Build the "new" row
     const [newRow, newNameInput] = createRow();
-    newNameInput.placeholder = placeholder;
+    newNameInput.placeholder = this.placeholder;
 
     // Animate height when it's added.
     const startH = this.el.offsetHeight;
@@ -163,10 +167,23 @@ class ParamTable {
       }
     );
 
+    this._renderPlaceholders();
     this._renderDeleteButtons();
 
     // Splitter neeeds new height.
     anim.finished.then(() => this.onRowChange());
+  }
+
+  /**
+   * Updates the placeholder text in the name inputs. Only the last "add new" row will show any text.
+   */
+  _renderPlaceholders() {
+    const nameInputs = Array.from(this.el.querySelectorAll('[data-name]'));
+    const lastInput = nameInputs.at(-1);
+    const otherInputs = nameInputs.slice(0, -1);
+
+    otherInputs.forEach((input) => (input.placeholder = ''));
+    lastInput.placeholder = this.placeholder;
   }
 
   /**
