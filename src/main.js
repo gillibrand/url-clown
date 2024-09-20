@@ -154,6 +154,8 @@ document.addEventListener('DOMContentLoaded', function onStartup() {
       positionSplitter();
     }
 
+    $('pathname').addEventListener('input', onValueChange);
+
     const queryParams = new URLSearchParams(url.search);
     queryTable = new ParamTable(
       $('query'),

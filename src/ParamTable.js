@@ -7,8 +7,13 @@ import { create, createNS } from './utils.js';
  * @returns {[Node, Node, Node]} Tuple of newly created row, name input, and value input.
  */
 function createRow(optionalParentNode) {
-  const row = create('div', optionalParentNode);
-  row.classList.add('ParamTable__row');
+  // Whole row has a wrapper around it so we can animate the height of the row as a single element
+  // when adding and removing. This means we cannot use as single grid. Each row needs to be its own
+  // grid.
+  const wrapper = create('div', optionalParentNode);
+  wrapper.className = 'ParamTable__row-wrapper';
+  const row = create('div', wrapper);
+  row.className = 'ParamTable__row';
 
   const nameInput = create('input', row);
   nameInput.spellcheck = false;
@@ -26,7 +31,6 @@ function createRow(optionalParentNode) {
   deleteButton.className = 'delete-button';
   deleteButton.title = 'Delete';
   deleteButton.type = 'button';
-
   const svg = createNS('http://www.w3.org/2000/svg', 'svg', deleteButton);
   const use = createNS('http://www.w3.org/2000/svg', 'use', svg);
   use.setAttributeNS(
@@ -35,7 +39,37 @@ function createRow(optionalParentNode) {
     '../icons/symbol/sheet.svg#close'
   );
 
-  return [row, nameInput, valueInput, toolbar, deleteButton];
+  return [wrapper, nameInput, valueInput, toolbar, deleteButton];
+}
+
+/**
+ * Animates the height of an element to reveal it.
+ *
+ * @param {HTMLElement} el Element to animate. This is a JavaScript animation so style props are not
+ * actually changed.
+ * @param {boolean|undefined} reverse True to reverse and animation and wipe out.
+ * @returns Promise fires when animation is complete.
+ */
+async function animateWipeIn(el, reverse) {
+  // Lock body height during anim so the popup window isn't always resizing (which can lag)
+  const newBodyHeight = document.body.offsetHeight;
+  document.body.style.minHeight = newBodyHeight + 'px';
+
+  const h = el.offsetHeight;
+  const heightValues = reverse ? [`${h}px`, '0'] : ['0', `${h}px`];
+
+  const anim = el.animate(
+    {
+      height: heightValues,
+    },
+    {
+      duration: 400,
+      easing: 'ease',
+    }
+  );
+
+  await anim.finished;
+  document.body.style.minHeight = '';
 }
 
 class ParamTable {
@@ -81,23 +115,30 @@ class ParamTable {
       const button = e.target.closest('button');
       if (button && button.classList.contains('delete-button')) {
         e.stopPropagation();
-        this._deleteRow(button.closest('.ParamTable__row'));
+        this._deleteRow(button.closest('.ParamTable__row-wrapper'));
       }
     });
   }
 
   /**
+   * Deletes and removes a row from the table. If this is the last row, just clears the text and
+   * leaves it--there is always at least one row.
    *
-   * @param {HTMLElement} row
+   * @param {HTMLElement} rowWrapper The wrapper for the row to delete.
    */
-  _deleteRow(row) {
-    const rows = this.el.querySelectorAll('.ParamTable__row');
-    if (rows.length === 1) {
-      row.querySelectorAll('input').forEach((input) => {
+  async _deleteRow(rowWrapper) {
+    const allRows = this.el.querySelectorAll('.ParamTable__row');
+
+    if (allRows.length === 1) {
+      // Last row, so just clear all fields instead of deleting.
+      rowWrapper.querySelectorAll('input').forEach((input) => {
         input.value = '';
       });
     } else {
-      row.parentNode.removeChild(row);
+      rowWrapper.inert = true;
+
+      await animateWipeIn(rowWrapper, true);
+      rowWrapper.parentNode.removeChild(rowWrapper);
       this.onRowChange();
     }
 
@@ -120,12 +161,10 @@ class ParamTable {
       buttons.at(-1).disabled = true;
     } else {
       const oneRow = rows[0];
-      const hasAnyText = Array.from(oneRow.querySelectorAll('input')).some(
-        (input) => input.value.trim()
+      const hasSomeText = Array.from(oneRow.querySelectorAll('input')).some(
+        (input) => input.value.trim().length > 0
       );
-
-      const button = oneRow.querySelector('.delete-button');
-      button.disabled = !hasAnyText;
+      oneRow.querySelector('.delete-button').disabled = !hasSomeText;
     }
   }
 
@@ -137,41 +176,29 @@ class ParamTable {
    *
    * @param {HTMLSection} section The pairs section to check and add to.
    */
-  _addNewRowIfNeeded() {
+  async _addNewRowIfNeeded() {
     const rows = Array.from(this.el.querySelectorAll('.ParamTable__row'));
     const lastRow = rows[rows.length - 1];
     const [oldNameInput] = lastRow.querySelectorAll('input');
 
-    // If there is a name in this row, it's usable, so "dirty" and we can proceed and will need a new
-    // one.
+    // If there is a name in this row, it's usable, so "dirty" and we can proceed and will need a
+    // new one.
     const hasNameText = oldNameInput.value.trim();
     if (!hasNameText) return;
-
-    // Turn into normal row.
-    oldNameInput.placeholder = '';
 
     // Build the "new" row
     const [newRow, newNameInput] = createRow();
     newNameInput.placeholder = this.placeholder;
 
-    // Animate height when it's added.
-    const startH = this.el.offsetHeight;
     this.el.appendChild(newRow);
-    const endH = this.el.offsetHeight;
-    const anim = this.el.animate(
-      {
-        height: [`${startH}px`, `${endH}px`],
-      },
-      {
-        duration: 200,
-      }
-    );
 
     this._renderPlaceholders();
     this._renderDeleteButtons();
 
-    // Splitter neeeds new height.
-    anim.finished.then(() => this.onRowChange());
+    await animateWipeIn(newRow);
+
+    // Splitter neeeds new height after size change
+    this.onRowChange();
   }
 
   /**
