@@ -63,7 +63,7 @@ async function animateWipeIn(el, reverse) {
       height: heightValues,
     },
     {
-      duration: 400,
+      duration: 200,
       easing: 'ease',
     }
   );
