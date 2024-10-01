@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Options - URL Clown</title>
+    <link rel="stylesheet" href="common.css" />
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body class="page-loading">
+    <header>
+      <h1>Options - URL Clown</h1>
+    </header>
+
+    <main class="flex flex-col gap-4">
+      <div class="flex align-items-end gap-4">
+        <section id="color-section" class="flex flex-col">
+          <h2>Clown head style</h2>
+          <label>
+            <input type="radio" name="clown-head" value="color" />
+            Color
+          </label>
+
+          <label>
+            <input type="radio" name="clown-head" value="grayscale" />
+            Gray
+          </label>
+
+          <label>
+            <input type="radio" name="clown-head" value="hidden" />
+            Hidden
+          </label>
+        </section>
+
+        <img class="clown-preview" id="clown-preview" src="../icons/icon128.svg" alt="clown head" />
+      </div>
+    </main>
+
+    <script src="options.js" type="module"></script>
+  </body>
+</html>

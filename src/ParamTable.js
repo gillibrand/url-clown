@@ -57,13 +57,15 @@ async function animateWipeIn(el, reverse) {
 
   const h = el.offsetHeight;
   const heightValues = reverse ? [`${h}px`, '0'] : ['0', `${h}px`];
+  // const opacityValues = reverse ? [1, 0] : [0, 1];
 
   const anim = el.animate(
     {
       height: heightValues,
+      // opacity: opacityValues,
     },
     {
-      duration: 200,
+      duration: 300,
       easing: 'ease',
     }
   );
@@ -81,13 +83,7 @@ class ParamTable {
    * @param {()=>void} onValueChange Callback when a param name or value changes.
    * @param {()=>void} onRowChange Callback when param row is added or deleted.
    */
-  constructor(
-    sectionEl,
-    initialParams,
-    placeholderText,
-    onValueChange,
-    onRowChange
-  ) {
+  constructor(sectionEl, initialParams, placeholderText, onValueChange, onRowChange) {
     this.el = sectionEl;
     this.onRowChange = onRowChange;
     this.placeholder = placeholderText;

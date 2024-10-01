@@ -43,9 +43,7 @@ function updateActiveTabUrl() {
   // If there is a single hash "name" without a = value, then assume it's a traditional single hash
   // value, as opposed to name value pairs. In that case, we don't escape the hash, just use as is.
   const isTraditionalHash = hashPairs.length === 1 && !hashPairs[0][1];
-  const hashString = isTraditionalHash
-    ? hashPairs[0][0]
-    : asParamString(hashPairs);
+  const hashString = isTraditionalHash ? hashPairs[0][0] : asParamString(hashPairs);
 
   url.hash = hashString ? '#' + hashString : '';
 
@@ -58,19 +56,11 @@ function updateActiveTabUrl() {
 }
 
 function getFirstColWidthPx() {
-  return parseInt(
-    window.getComputedStyle(document.body).getPropertyValue('--first-col-width')
-  );
+  return parseInt(window.getComputedStyle(document.body).getPropertyValue('--first-col-width'));
 }
 
 function setFirstColWidthPx(widthPx) {
   document.body.style.setProperty('--first-col-width', widthPx + 'px');
-}
-
-const savedWidthPx = localStorage.getItem('widthPx');
-if (savedWidthPx > 0) {
-  console.debug('>>> restored col width', savedWidthPx);
-  setFirstColWidthPx(savedWidthPx);
 }
 
 /**
@@ -92,7 +82,6 @@ function tryStartDrag(e) {
     e,
 
     function onMove(diffX) {
-      // const widthPx = Math.max(100, Math.min(600, startWidthPx + diffX));
       const widthPx = startWidthPx + diffX;
       setFirstColWidthPx(widthPx);
       splitter.style.translate = `${diffX}px`;
@@ -103,7 +92,7 @@ function tryStartDrag(e) {
       document.body.classList.remove('is-dragging');
 
       const widthPx = getFirstColWidthPx();
-      localStorage.setItem('widthPx', widthPx);
+      chrome.storage.sync.set({ widthPx });
       positionSplitter();
     },
 
@@ -137,8 +126,50 @@ function positionSplitter() {
 let queryTable;
 let hashTable;
 
+/**
+ * Callback when options are changed. Listens for head mode changes. Not really needed, but
+ *
+ * @param {object} changes Map of changed properties to their old and new values
+ */
+function onOptionsChanged(changes) {
+  const clownHeadMode = changes.clownHeadMode;
+  if (!clownHeadMode) return;
+
+  updateClownHead(clownHeadMode.newValue);
+}
+
+/**
+ * Updates the display of the clown head's color or visibility.
+ *
+ * @param {'color' | 'grayscale' | 'hidden'} mode New mode to show the clown head as.
+ */
+function updateClownHead(mode) {
+  const clownHead = $('clown-head');
+
+  if (mode === 'hidden') {
+    clownHead.style.display = 'none';
+    return;
+  }
+
+  clownHead.style.display = '';
+  clownHead.style.filter = mode === 'grayscale' ? 'grayscale()' : '';
+}
+
+const optionsPromise = chrome.storage.sync.get(['widthPx', 'clownHeadMode']);
+
 document.addEventListener('DOMContentLoaded', function onStartup() {
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+  chrome.tabs.query({ active: true, currentWindow: true }, async function (tabs) {
+    const options = await optionsPromise;
+
+    const saveWidthPx = options.widthPx;
+    if (saveWidthPx > 150 && saveWidthPx < window.innerWidth - 150) {
+      // console.debug('>>> restored col width', options.widthPx);
+      setFirstColWidthPx(options.widthPx);
+    }
+
+    const clownHeadMode = options.clownHeadMode;
+    updateClownHead(clownHeadMode);
+
     const tab = tabs[0];
     activeTab = tab;
     const url = new URL(tab.url);
@@ -156,6 +187,12 @@ document.addEventListener('DOMContentLoaded', function onStartup() {
 
     $('pathname').addEventListener('input', onValueChange);
 
+    $('options').href = `chrome-extension://${chrome.runtime.id}/src/options.html`;
+    $('options').addEventListener('click', (e) => {
+      e.preventDefault();
+      chrome.runtime.openOptionsPage();
+    });
+
     const queryParams = new URLSearchParams(url.search);
     queryTable = new ParamTable(
       $('query'),
@@ -166,13 +203,7 @@ document.addEventListener('DOMContentLoaded', function onStartup() {
     );
 
     const hashParams = new URLSearchParams(url.hash.slice(1));
-    hashTable = new ParamTable(
-      $('hash'),
-      hashParams,
-      'Add hash param',
-      onValueChange,
-      onRowChange
-    );
+    hashTable = new ParamTable($('hash'), hashParams, 'Add hash param', onValueChange, onRowChange);
 
     positionSplitter();
     $('splitter').addEventListener('mousedown', tryStartDrag);
@@ -187,4 +218,6 @@ document.addEventListener('DOMContentLoaded', function onStartup() {
   $('cancel').addEventListener('click', function onCance() {
     window.close();
   });
+
+  chrome.storage.onChanged.addListener(onOptionsChanged);
 });

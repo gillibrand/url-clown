@@ -1,0 +1,138 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+html {
+  --first-col-width: 200px;
+}
+
+body {
+  background-color: #f7f7f7;
+  color: #444;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+    Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+input {
+  font-family: 'Source Code Pro', 'Menlo', 'Consolas', 'Courier New', monospace;
+}
+
+h1,
+h2 {
+  margin: 0 0 0.5rem 0;
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+
+h2 {
+  font-size: 1rem;
+}
+
+input:not([type]),
+input[type='text'] {
+  border-radius: 3px;
+  padding: 0.3rem;
+  border: solid 1px rgb(101, 101, 101);
+  min-width: 5rem;
+  font-size: inherit;
+}
+
+.push-button {
+  appearance: none;
+  border: solid 1px #999;
+
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.3rem;
+  background-color: #fff;
+
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+
+  &:not(:disabled) {
+    border-bottom-color: #333;
+
+    &:hover {
+      background-color: #f7f7f7;
+    }
+
+    &:active {
+      background-color: #dedede;
+    }
+  }
+
+  &:not([disabled]).is-default {
+    color: white;
+    background-color: #2b68d1;
+    border-bottom-color: #113762;
+
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+
+    &:hover {
+      background-color: rgb(35, 133, 232);
+    }
+
+    &:active {
+      background-color: rgb(29, 110, 191);
+    }
+  }
+}
+
+footer {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-block-start: 2rem;
+  align-items: center;
+  button {
+    min-width: 5rem;
+  }
+}
+
+/* Utils */
+
+.block {
+  display: block;
+}
+
+.flex {
+  display: flex;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.mt-0 {
+  margin-block-start: 0;
+}
+
+.mt-4 {
+  margin-block-start: 1rem;
+}
+
+.flex-auto {
+  flex: auto;
+}
+
+.cursor-default {
+  cursor: default;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.align-items-end {
+  align-items: flex-end;
+}
+
+.justify-items-end {
+  justify-content: flex-end;
+}
+
+.gap-4 {
+  gap: 1rem;
+}

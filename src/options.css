@@ -1,0 +1,36 @@
+body {
+  font-size: 0.875rem;
+  margin: 0;
+  padding: 1rem;
+}
+
+header,
+main,
+footer {
+  margin-inline: auto;
+  max-width: 500px;
+}
+
+header {
+  border-bottom: solid 1px gray;
+  margin-bottom: 1rem;
+}
+
+.clown-preview {
+  object-fit: fill;
+  max-height: 4rem;
+  transition: opacity 300ms ease, filter 200ms ease;
+}
+
+.clown-preview--grayscale {
+  filter: grayscale();
+}
+
+.clown-preview--hidden {
+  opacity: 0;
+  filter: grayscale();
+}
+
+.page-loading > * {
+  display: none;
+}
