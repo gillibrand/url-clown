@@ -18,6 +18,10 @@ body.is-dragging,
 body.is-dragging * {
   cursor: ew-resize !important;
 }
+.ParamTable__row-wrapper {
+  /* stop margin collpse */
+  display: flow-root;
+}
 
 .ParamTable {
   /* Counteract the margin on top row. We could not add it there, but then the animations are harder
