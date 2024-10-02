@@ -1,7 +1,16 @@
+:root {
+  --blue: #2b68d1;
+}
+
 *,
 *::after,
 *::before {
   box-sizing: border-box;
+}
+
+* {
+  /* match button theme color */
+  outline-color: var(--blue);
 }
 
 html {
@@ -65,7 +74,7 @@ input[type='text'] {
 
   &:not([disabled]).is-default {
     color: white;
-    background-color: #2b68d1;
+    background-color: var(--blue);
     border-bottom-color: #113762;
 
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.2);
@@ -125,7 +134,7 @@ footer {
   flex-direction: column;
 }
 
-.align-items-end {
+.items-end {
   align-items: flex-end;
 }
 
@@ -135,4 +144,8 @@ footer {
 
 .gap-4 {
   gap: 1rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
 }

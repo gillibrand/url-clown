@@ -9,7 +9,11 @@
   <body style="user-select: none">
     <form id="form">
       <h2 class="mt-0">Path</h2>
-      <input type="text" id="pathname" autofocus class="block w-full" spellcheck="false" />
+      <div class="flex gap-2">
+        <input type="text" id="pathname" autofocus class="block w-full" spellcheck="false" />
+        <!-- No button here. Just to take the same amount of white space as is on the on param rows. -->
+        <span class="delete-button" inert aria-hidden="true"></span>
+      </div>
 
       <h2>Query (?)</h2>
       <section id="query" class="ParamTable"></section>

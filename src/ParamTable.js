@@ -55,14 +55,14 @@ async function animateWipeIn(el, reverse) {
   const newBodyHeight = document.body.offsetHeight;
   document.body.style.minHeight = newBodyHeight + 'px';
 
+  el.style.overflow = 'hidden';
+
   const h = el.offsetHeight;
   const heightValues = reverse ? [`${h}px`, '0'] : ['0', `${h}px`];
-  // const opacityValues = reverse ? [1, 0] : [0, 1];
 
   const anim = el.animate(
     {
       height: heightValues,
-      // opacity: opacityValues,
     },
     {
       duration: 300,
@@ -71,6 +71,7 @@ async function animateWipeIn(el, reverse) {
   );
 
   await anim.finished;
+  el.style.overflow = '';
   document.body.style.minHeight = '';
 }
 

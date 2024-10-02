@@ -26,12 +26,6 @@ body.is-dragging * {
   margin-top: -0.5rem;
 }
 
-/* Each row has a wrapper element to make it easy to animate a wipe in/out effect. The means each
-row is a separate grid, and all rows needs to have the same width content so they all line up. */
-.ParamTable__row-wrapper {
-  overflow: hidden;
-}
-
 .ParamTable__row {
   margin-top: 0.5rem;
 
@@ -39,7 +33,6 @@ row is a separate grid, and all rows needs to have the same width content so the
   position: relative;
   grid-template-columns: var(--first-col-width) auto 1fr auto;
   gap: 0.5rem;
-  overflow: hidden;
   align-items: center;
 }
 
@@ -82,6 +75,7 @@ row is a separate grid, and all rows needs to have the same width content so the
 
   &:disabled {
     visibility: hidden;
+    /* opacity: 0.2; */
   }
 
   &:hover:not(:disabled) {
