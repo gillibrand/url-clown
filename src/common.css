@@ -1,5 +1,6 @@
 :root {
   --blue: #2b68d1;
+  --first-col-width: 200px;
 }
 
 *,
@@ -11,10 +12,6 @@
 * {
   /* match button theme color */
   outline-color: var(--blue);
-}
-
-html {
-  --first-col-width: 200px;
 }
 
 body {
@@ -86,17 +83,6 @@ input[type='text'] {
     &:active {
       background-color: rgb(29, 110, 191);
     }
-  }
-}
-
-footer {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-block-start: 2rem;
-  align-items: center;
-  button {
-    min-width: 5rem;
   }
 }
 

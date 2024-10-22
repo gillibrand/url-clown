@@ -97,7 +97,7 @@ function tryStartDrag(e) {
     },
 
     150,
-    window.innerWidth - 150
+    window.innerWidth - 175
   );
 }
 
@@ -157,13 +157,21 @@ function updateClownHead(mode) {
 
 const optionsPromise = chrome.storage.sync.get(['widthPx', 'clownHeadMode']);
 
+function onValueChange() {
+  $('ok').disabled = false;
+}
+
+function onRowChange() {
+  $('ok').disabled = false;
+  positionSplitter();
+}
+
 document.addEventListener('DOMContentLoaded', function onStartup() {
   chrome.tabs.query({ active: true, currentWindow: true }, async function (tabs) {
     const options = await optionsPromise;
 
     const saveWidthPx = options.widthPx;
     if (saveWidthPx > 150 && saveWidthPx < window.innerWidth - 150) {
-      // console.debug('>>> restored col width', options.widthPx);
       setFirstColWidthPx(options.widthPx);
     }
 
@@ -175,15 +183,6 @@ document.addEventListener('DOMContentLoaded', function onStartup() {
     const url = new URL(tab.url);
 
     $('pathname').value = decodeURI(url.pathname);
-
-    function onValueChange() {
-      $('ok').disabled = false;
-    }
-
-    function onRowChange() {
-      $('ok').disabled = false;
-      positionSplitter();
-    }
 
     $('pathname').addEventListener('input', onValueChange);
 
