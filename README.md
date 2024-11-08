@@ -2,6 +2,8 @@
 
 A Chrome extension to easily decode and edit URL query and hash parameters.
 
+<img src="example.png">
+
 ## How to use
 
 Open and make a change. Click `Save` to update the URL on the current tab.
