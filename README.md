@@ -22,4 +22,4 @@ Open and make a change. Click `Save` to update the URL on the current tab.
 
 2. Yet another URL editor extension?
 
-   Yes. None that I found work with hash params.
+   Yes. None that I found work with URL encoded hash params.

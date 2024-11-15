@@ -1,5 +1,5 @@
 :root {
-  --blue: #2b68d1;
+  --blue: #286de3;
   --first-col-width: 200px;
 }
 
@@ -49,16 +49,14 @@ input[type='text'] {
 
 .push-button {
   appearance: none;
-  border: solid 1px #999;
+  border: solid 1px #bbb;
 
   padding: 0.25rem 0.75rem;
   border-radius: 0.3rem;
   background-color: #fff;
 
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-
   &:not(:disabled) {
-    border-bottom-color: #333;
+    border-bottom-color: #777;
 
     &:hover {
       background-color: #f7f7f7;
@@ -71,13 +69,13 @@ input[type='text'] {
 
   &:not([disabled]).is-default {
     color: white;
+    color: rgba(255, 255, 255, 1);
     background-color: var(--blue);
+    border-color: var(--blue);
     border-bottom-color: #113762;
 
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-
     &:hover {
-      background-color: rgb(35, 133, 232);
+      background-color: #3b7ae5;
     }
 
     &:active {
