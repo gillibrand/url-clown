@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function onStartup() {
     updateActiveTabUrl();
   });
 
-  $('cancel').addEventListener('click', function onCance() {
+  $('cancel').addEventListener('click', function onCancel() {
     window.close();
   });
 
