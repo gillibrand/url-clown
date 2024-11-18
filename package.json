@@ -3,9 +3,14 @@
     "@eslint/js": "^9.10.0",
     "eslint": "^9.10.0",
     "globals": "^15.9.0",
-    "svg-sprite": "^2.0.4"
+    "svg-sprite": "^2.0.4",
+    "vite": "^5.4.11"
   },
   "scripts": {
-    "sheet": "svg-sprite --symbol --dest icons --ss=sheet.svg icons/close.svg"
+    "sheet": "svg-sprite --symbol --dest icons --ss=sheet.svg icons/close.svg",
+    "copy-icons": "rsync -av --include=\"*/\" --include=\"*.png\" --include=\"*.svg\" --exclude=\"*\" ./icons dist",
+    "copy-static": "cp manifest.json dist && npm run copy-icons",
+    "zip": "cd dist && zip  -r ../url-clown.zip .",
+    "build": "rm -rf dist && npm run sheet && vite build && npm run copy-static && npm run zip"
   }
 }

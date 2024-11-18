@@ -53,7 +53,7 @@ body.is-dragging * {
   opacity: 0;
   cursor: ew-resize;
   transition: opacity 100ms ease 25ms;
-  background-color: gray;
+  background-color: light-dark(gray, lightgray);
 
   &:hover {
     opacity: 0.15;
