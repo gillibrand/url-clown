@@ -2,7 +2,7 @@
 
 A Chrome extension to easily decode and edit URL query and hash parameters. Available on the [Chrome Web Store](https://chromewebstore.google.com/detail/url-clown/alcebgboodppnkoioknieomnkoknjhnf).
 
-<img src="screenshot.png">
+<img src="store-images/screenshot.png">
 
 ## How to use
 
