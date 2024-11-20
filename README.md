@@ -14,6 +14,12 @@ Open and make a change. Click `Save` to update the URL on the current tab.
 
 `Hash (#)` edits the hash, or URL fragment, and works in two ways. If there is one entry, and it's only a name, then it is used as-as and is a traditional URL fragment. If there are name, value pairs, then the hash section is encoded and treated just like query params. This is not a browser standard, but is a common convention for single page apps that encode state information in the hash.
 
+## How to build
+
+There is no required build step for development. Tell Chrome to `Load unpacked` the root directory and will load it and any changes.
+
+Use `npm run build` for a final optimized build to `dist`.
+
 ## FAQ
 
 1. Why "clown"?
