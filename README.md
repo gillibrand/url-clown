@@ -18,7 +18,7 @@ Open and make a change. Click `Save` to update the URL on the current tab.
 
 There is no required build step for development. Tell Chrome to `Load unpacked` the root directory and will load it and any changes.
 
-Use `npm run build` for a final optimized build to `dist`.
+Use `npm run build` for a final optimized build to `dist`. Assumes a `bash` shell.
 
 ## FAQ
 
