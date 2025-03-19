@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "URL Clown",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Easily edit URL query and hash parameters.",
   "action": {
     "default_popup": "src/popup.html"
@@ -13,5 +13,8 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "permissions": ["activeTab", "storage"]
+  "permissions": ["activeTab", "storage"],
+  "background": {
+    "service_worker": "src/background.js"
+  }
 }
