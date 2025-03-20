@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "URL Clown",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Easily edit URL query and hash parameters.",
   "action": {
     "default_popup": "src/popup.html"
