@@ -16,5 +16,6 @@
   "permissions": ["activeTab", "storage"],
   "background": {
     "service_worker": "src/background.js"
-  }
+  },
+  "incognito": "split"
 }
